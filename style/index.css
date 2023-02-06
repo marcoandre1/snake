@@ -4,17 +4,22 @@ html, body {
 }
 
 body {
-    background: black;
+    background-color:rgb(0 0 0 / 1);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-div {
-    color: white;
-    font-size: 300%;
+h1 {
+    color: #ec4899;
+}
+
+p {
+    color: #8b5cf6;
 }
 
 canvas {
+    background-color: rgb(31 41 55 / 1);
     border: 1px solid white;
 }
