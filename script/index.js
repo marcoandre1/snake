@@ -1,6 +1,6 @@
 let canvas = document.getElementById('game');
 let context = canvas.getContext('2d');
-let score = document.getElementById('score');
+let score = 0;
 let grid = 16;
 let snake = {
     x: 160,
@@ -48,6 +48,10 @@ function loop() {
     if (snake.cells.length > snake.maxCells) {
         snake.cells.pop();
     }
+    //draw score
+    context.font = 'caption';
+    context.fillStyle = 'white';
+    context.fillText("Score: " + score, 20, 30);
     // draw apple
     context.fillStyle = 'red';
     context.fillRect(apple.x, apple.y, grid - 1, grid - 1);
@@ -60,7 +64,7 @@ function loop() {
             snake.maxCells++;
             apple.x = getRandomInt(0, 25) * grid;
             apple.y = getRandomInt(0, 25) * grid;
-            score.textContent++;
+            score++;
         }
         // check collision with all cells after this one (modified bubble sort)
         for (let i = index + 1; i < snake.cells.length; i++) {
@@ -75,7 +79,7 @@ function loop() {
                 snake.dy = 0;
                 apple.x = getRandomInt(0, 25) * grid;
                 apple.y = getRandomInt(0, 25) * grid;
-                score.textContent = "0";
+                score = 0;
             }
         }
     });
