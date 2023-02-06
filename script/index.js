@@ -80,23 +80,72 @@ function loop() {
         }
     });
 }
+
 document.addEventListener('keydown', function (e) {
     // prevent snake from backtracking on itself
     if (e.which === 37 && snake.dx === 0) {
+        // left arrow
         snake.dx = -grid;
         snake.dy = 0;
     }
     else if (e.which === 38 && snake.dy === 0) {
+        // up arrow
         snake.dy = -grid;
         snake.dx = 0;
     }
     else if (e.which === 39 && snake.dx === 0) {
+        // right arrow
         snake.dx = grid;
         snake.dy = 0;
     }
     else if (e.which === 40 && snake.dy === 0) {
+        // down arrow
         snake.dy = grid;
         snake.dx = 0;
     }
 });
+
+let touchstartX = 0
+let touchendX = 0
+let touchstartY = 0
+let touchendY = 0
+    
+function checkDirection() {
+    if (Math.abs(touchendY - touchstartY) > Math.abs(touchendX - touchstartX)) {
+        if (touchendY < touchstartY && snake.dy === 0) {
+            // swiped up!
+            snake.dy = -grid;
+            snake.dx = 0;
+        }
+        if (touchendY > touchstartY && snake.dy === 0) {
+            // swiped down!
+            snake.dy = grid;
+            snake.dx = 0;
+        }
+    }
+    else {
+        if (touchendX < touchstartX && snake.dx === 0) {
+            // swiped left!
+            snake.dx = -grid;
+            snake.dy = 0;
+        }
+        if (touchendX > touchstartX && snake.dx === 0) {
+            // swiped right!
+            snake.dx = grid;
+            snake.dy = 0;
+        }
+    }
+}
+
+document.addEventListener('touchstart', e => {
+    touchstartX = e.changedTouches[0].screenX
+    touchstartY = e.changedTouches[0].screenY
+})
+  
+document.addEventListener('touchend', e => {
+    touchendX = e.changedTouches[0].screenX
+    touchendY = e.changedTouches[0].screenY
+    checkDirection()
+})
+
 requestAnimationFrame(loop);
