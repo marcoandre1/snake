@@ -18,13 +18,43 @@ let apple = {
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
+
+// sets canvas width and height for mobile, could be a resize in future if needed
+if (window.innerWidth < 400) {
+    canvas.width = 300;
+    canvas.height = 300;
+    grid = 12;
+    snake = {
+        x: 120,
+        y: 120,
+        dx: grid,
+        dy: 0,
+        cells: [],
+        maxCells: 3
+    };
+    count = 0;
+    apple = {
+        x: 240,
+        y: 240
+    };
+}
+
 // game loop
 function loop() {
     requestAnimationFrame(loop);
     // slow game loop to 15 fps instead of 60 - 60/15 = 4
-    if (++count < 4) {
-        return;
+    // slow game loop to 10 fps instead of 60 - 60/10 = 6 for mobile
+    if (canvas.width === 300) {
+        if (++count < 6) {
+            return
+        }
     }
+    else {
+        if (++count < 4) {
+            return;
+        }
+    }
+    
     count = 0;
     context.clearRect(0, 0, canvas.width, canvas.height);
     snake.x += snake.dx;
@@ -70,16 +100,31 @@ function loop() {
         for (let i = index + 1; i < snake.cells.length; i++) {
 
             // collision. reset game
-            if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
-                snake.x = 160;
-                snake.y = 160;
-                snake.cells = [];
-                snake.maxCells = 4;
-                snake.dx = grid;
-                snake.dy = 0;
-                apple.x = getRandomInt(0, 25) * grid;
-                apple.y = getRandomInt(0, 25) * grid;
-                score = 0;
+            if (canvas.width === 300) {
+                if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+                    snake.x = 120;
+                    snake.y = 120;
+                    snake.cells = [];
+                    snake.maxCells = 3;
+                    snake.dx = grid;
+                    snake.dy = 0;
+                    apple.x = getRandomInt(0, 25) * grid;
+                    apple.y = getRandomInt(0, 25) * grid;
+                    score = 0;
+                }
+            }
+            else {
+                if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+                    snake.x = 160;
+                    snake.y = 160;
+                    snake.cells = [];
+                    snake.maxCells = 4;
+                    snake.dx = grid;
+                    snake.dy = 0;
+                    apple.x = getRandomInt(0, 25) * grid;
+                    apple.y = getRandomInt(0, 25) * grid;
+                    score = 0;
+                }
             }
         }
     });
