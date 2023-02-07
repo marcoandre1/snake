@@ -30,7 +30,7 @@ if (window.innerWidth < 400) {
         dx: grid,
         dy: 0,
         cells: [],
-        maxCells: 3
+        maxCells: 4
     };
     count = 0;
     apple = {
@@ -83,7 +83,10 @@ function loop() {
     context.fillStyle = 'white';
     context.fillText("Score: " + score, 20, 30);
     // draw apple
-    context.fillStyle = 'red';
+    context.fillStyle = `rgb(
+        255,
+        ${Math.floor(255 - 42.5 * (score % 6))},
+        0)`;
     context.fillRect(apple.x, apple.y, grid - 1, grid - 1);
     // draw snake
     context.fillStyle = 'green';
@@ -105,7 +108,7 @@ function loop() {
                     snake.x = 120;
                     snake.y = 120;
                     snake.cells = [];
-                    snake.maxCells = 3;
+                    snake.maxCells = 4;
                     snake.dx = grid;
                     snake.dy = 0;
                     apple.x = getRandomInt(0, 25) * grid;
