@@ -13,8 +13,6 @@ if (window.innerWidth < 400) {
 // sets the pixels in a rectangular area to transparent black
 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-let score = 0;
-
 // square dimension in pixels
 const square = canvas.width === 300 ? 12 : 16;
 
@@ -36,105 +34,105 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-let t = Date.now();
-let counter = 0;
+let score = 0;
+
+let previousGameTimeStamp = performance.now();
+let previousTimeStamp = performance.now();
+const intendedFps = 15
+const fpsInterval = 1000 / intendedFps;
 
 // game loop
-function loop() {
-    let timePassed = (Date.now() - t) / 1000;
-    t = Date.now();
-    let fps = Math.round(1 / timePassed);
+function loop(timestamp) {
 
-    // slow game loop to 15 fps instead of 60 - 60/15 = 4
-    // slow game loop to 10 fps instead of 60 - 60/10 = 6 for mobile
-    if (fps > 70) {
-        if (++counter < 6) {
-            window.requestAnimationFrame(loop);
-            return
-        }
-    }
-    else {
-        if (++counter < 4) {
-            window.requestAnimationFrame(loop);
-            return;
-        }
-    }
+    const gameElapsed = timestamp - previousGameTimeStamp;
+
+    const elapsed = (timestamp - previousTimeStamp) / 1000;
+
+    if (gameElapsed > fpsInterval) {
+        // commonly required at the start of each frame in an animation
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const fps = Math.round(1 / elapsed);
+        ctx.font = 'caption';
+        ctx.fillStyle = 'white';
+        ctx.fillText("device FPS: " + fps, 20, 50);
+
+        const gameFps = Math.round(1000 / gameElapsed);
+        ctx.font = 'caption';
+        ctx.fillStyle = 'white';
+        ctx.fillText("game FPS: " + gameFps, 20, 70);
     
-    counter = 0;
-
-    // commonly required at the start of each frame in an animation
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.font = 'caption';
-    ctx.fillStyle = 'white';
-    ctx.fillText("FPS: " + fps, 20, 50);
-
-    //draw score
-    ctx.font = 'caption';
-    ctx.fillStyle = 'white';
-    ctx.fillText("Score: " + score, 20, 30);
-
-    // draw apple
-    ctx.fillStyle = `rgb(
-        255,
-        ${Math.floor(255 - 42.5 * (score % 6))},
-        0)`;
-    ctx.fillRect(apple.x, apple.y, square - 1, square - 1);
-
-    // snake head moves in the x, y direction
-    snake.x += snake.dx;
-    snake.y += snake.dy;
-
-    // wrap snake position on edge of screen
-    if (snake.x < 0) {
-        snake.x = canvas.width - square;
-    }
-    else if (snake.x >= canvas.width) {
-        snake.x = 0;
-    }
-    if (snake.y < 0) {
-        snake.y = canvas.height - square;
-    }
-    else if (snake.y >= canvas.height) {
-        snake.y = 0;
-    }
-
-    // Keeps track of the snake head by inserting the given values to the beginning of the array
-    snake.cells.unshift({ x: snake.x, y: snake.y });
+        //draw score
+        ctx.font = 'caption';
+        ctx.fillStyle = 'white';
+        ctx.fillText("Score: " + score, 20, 30);
     
-    // remove cells as we move away from them
-    if (snake.cells.length > snake.maxCells) {
-        snake.cells.pop();
-    }
+        // draw apple
+        ctx.fillStyle = `rgb(
+            255,
+            ${Math.floor(255 - 42.5 * (score % 6))},
+            0)`;
+        ctx.fillRect(apple.x, apple.y, square - 1, square - 1);
     
-    // draw snake
-    ctx.fillStyle = 'green';
-    snake.cells.forEach(function (cell, index) {
-        ctx.fillRect(cell.x, cell.y, square - 1, square - 1);
-        // snake ate apple
-        if (cell.x === apple.x && cell.y === apple.y) {
-            score++;
-            snake.maxCells++;
-            apple.x = getRandomInt(0, 25) * square;
-            apple.y = getRandomInt(0, 25) * square;
+        // snake head moves in the x, y direction
+        snake.x += snake.dx;
+        snake.y += snake.dy;
+    
+        // wrap snake position on edge of screen
+        if (snake.x < 0) {
+            snake.x = canvas.width - square;
         }
-        // check collision with all cells after this one (modified bubble sort)
-        for (let i = index + 1; i < snake.cells.length; i++) {
-
-            // collision. reset game
-            if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
-                snake.x = canvas.width === 300 ? 120 : 160;
-                snake.y = canvas.width === 300 ? 120 : 160;
-                snake.cells = [];
-                snake.maxCells = 4;
-                snake.dx = square;
-                snake.dy = 0;
+        else if (snake.x >= canvas.width) {
+            snake.x = 0;
+        }
+        if (snake.y < 0) {
+            snake.y = canvas.height - square;
+        }
+        else if (snake.y >= canvas.height) {
+            snake.y = 0;
+        }
+    
+        // Keeps track of the snake head by inserting the given values to the beginning of the array
+        snake.cells.unshift({ x: snake.x, y: snake.y });
+        
+        // remove cells as we move away from them
+        if (snake.cells.length > snake.maxCells) {
+            snake.cells.pop();
+        }
+        
+        // draw snake
+        ctx.fillStyle = 'green';
+        snake.cells.forEach(function (cell, index) {
+            ctx.fillRect(cell.x, cell.y, square - 1, square - 1);
+            // snake ate apple
+            if (cell.x === apple.x && cell.y === apple.y) {
+                score++;
+                snake.maxCells++;
                 apple.x = getRandomInt(0, 25) * square;
                 apple.y = getRandomInt(0, 25) * square;
-                score = 0;
             }
-        }
-    });
+            // check collision with all cells after this one (modified bubble sort)
+            for (let i = index + 1; i < snake.cells.length; i++) {
+    
+                // collision. reset game
+                if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+                    snake.x = canvas.width === 300 ? 120 : 160;
+                    snake.y = canvas.width === 300 ? 120 : 160;
+                    snake.cells = [];
+                    snake.maxCells = 4;
+                    snake.dx = square;
+                    snake.dy = 0;
+                    apple.x = getRandomInt(0, 25) * square;
+                    apple.y = getRandomInt(0, 25) * square;
+                    score = 0;
+                }
+            }
+        });
+
+        previousGameTimeStamp = timestamp;
+    }
+
+    previousTimeStamp = timestamp;
 
     // keeps the loop going
     window.requestAnimationFrame(loop);
