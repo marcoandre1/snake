@@ -35,11 +35,12 @@ function getRandomInt(min, max) {
 }
 
 let score = 0;
+let highestScore = 0;
 
 let previousGameTimeStamp = performance.now();
 let previousTimeStamp = performance.now();
-const intendedFps = 15
-const fpsInterval = 1000 / intendedFps;
+let intendedFps = 15
+let fpsInterval = 1000 / intendedFps;
 
 // game loop
 function loop(timestamp) {
@@ -47,6 +48,50 @@ function loop(timestamp) {
     const gameElapsed = timestamp - previousGameTimeStamp;
 
     const elapsed = (timestamp - previousTimeStamp) / 1000;
+
+    switch (score) {
+        case 6:
+          intendedFps = 20;
+          fpsInterval = 1000 / intendedFps;
+          break;
+        case 12:
+          intendedFps = 25;
+          fpsInterval = 1000 / intendedFps;
+          break;
+        case 18:
+          intendedFps = 30;
+          fpsInterval = 1000 / intendedFps;
+          break;
+        case 24:
+          intendedFps = 35;
+          fpsInterval = 1000 / intendedFps;
+          break;
+        case 30:
+          intendedFps = 40;
+          fpsInterval = 1000 / intendedFps;
+          break;
+        case 36:
+          intendedFps = 45;
+          fpsInterval = 1000 / intendedFps;
+          break;
+        case 42:
+          intendedFps = 50;
+          fpsInterval = 1000 / intendedFps;
+          break;
+        case 48:
+          intendedFps = 55;
+          fpsInterval = 1000 / intendedFps;
+          break;
+        case 54:
+          intendedFps = 60;
+          fpsInterval = 1000 / intendedFps;
+          break;
+        case 60:
+          intendedFps = 65;
+          fpsInterval = 1000 / intendedFps;
+          break;
+        default:
+    }
 
     if (gameElapsed > fpsInterval) {
         // commonly required at the start of each frame in an animation
@@ -57,7 +102,7 @@ function loop(timestamp) {
         ctx.fillStyle = 'white';
         ctx.fillText("device FPS: " + fps, 20, 50);
 
-        const gameFps = Math.round(1000 / gameElapsed);
+        const gameFps = Math.round(1 / (gameElapsed / 1000));
         ctx.font = 'caption';
         ctx.fillStyle = 'white';
         ctx.fillText("game FPS: " + gameFps, 20, 70);
@@ -66,6 +111,11 @@ function loop(timestamp) {
         ctx.font = 'caption';
         ctx.fillStyle = 'white';
         ctx.fillText("Score: " + score, 20, 30);
+
+        //draw highest score
+        ctx.font = 'caption';
+        ctx.fillStyle = 'white';
+        ctx.fillText("Highest score: " + highestScore, 20, 90);
     
         // draw apple
         ctx.fillStyle = `rgb(
@@ -101,8 +151,12 @@ function loop(timestamp) {
         }
         
         // draw snake
-        ctx.fillStyle = 'green';
         snake.cells.forEach(function (cell, index) {
+            if (index === 0) {
+                ctx.fillStyle = 'purple'
+            } else {
+                ctx.fillStyle = 'green';
+            }
             ctx.fillRect(cell.x, cell.y, square - 1, square - 1);
             // snake ate apple
             if (cell.x === apple.x && cell.y === apple.y) {
@@ -124,7 +178,10 @@ function loop(timestamp) {
                     snake.dy = 0;
                     apple.x = getRandomInt(0, 25) * square;
                     apple.y = getRandomInt(0, 25) * square;
+                    highestScore = score > highestScore ? score : highestScore;
                     score = 0;
+                    intendedFps = 15;
+                    fpsInterval = 1000 / intendedFps;
                 }
             }
         });
