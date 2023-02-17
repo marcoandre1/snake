@@ -30,10 +30,6 @@ let apple = {
     y: canvas.width === 300 ? 240 : 320
 };
 
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-}
-
 let score = 0;
 let highestScore = 0;
 
@@ -42,61 +38,27 @@ let previousTimeStamp = performance.now();
 let intendedFps = 15
 let fpsInterval = 1000 / intendedFps;
 
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function increaseSpeed(score) {
+    if (score % 6 === 0) {
+        intendedFps += 5;
+        fpsInterval = 1000 / intendedFps;
+    }
+}
+
 // game loop
 function loop(timestamp) {
 
     const gameElapsed = timestamp - previousGameTimeStamp;
 
-    const elapsed = (timestamp - previousTimeStamp) / 1000;
-
-    switch (score) {
-        case 6:
-          intendedFps = 20;
-          fpsInterval = 1000 / intendedFps;
-          break;
-        case 12:
-          intendedFps = 25;
-          fpsInterval = 1000 / intendedFps;
-          break;
-        case 18:
-          intendedFps = 30;
-          fpsInterval = 1000 / intendedFps;
-          break;
-        case 24:
-          intendedFps = 35;
-          fpsInterval = 1000 / intendedFps;
-          break;
-        case 30:
-          intendedFps = 40;
-          fpsInterval = 1000 / intendedFps;
-          break;
-        case 36:
-          intendedFps = 45;
-          fpsInterval = 1000 / intendedFps;
-          break;
-        case 42:
-          intendedFps = 50;
-          fpsInterval = 1000 / intendedFps;
-          break;
-        case 48:
-          intendedFps = 55;
-          fpsInterval = 1000 / intendedFps;
-          break;
-        case 54:
-          intendedFps = 60;
-          fpsInterval = 1000 / intendedFps;
-          break;
-        case 60:
-          intendedFps = 65;
-          fpsInterval = 1000 / intendedFps;
-          break;
-        default:
-    }
-
     if (gameElapsed > fpsInterval) {
         // commonly required at the start of each frame in an animation
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
+        const elapsed = (timestamp - previousTimeStamp) / 1000;
         const fps = Math.round(1 / elapsed);
         ctx.font = 'caption';
         ctx.fillStyle = 'white';
@@ -161,6 +123,7 @@ function loop(timestamp) {
             // snake ate apple
             if (cell.x === apple.x && cell.y === apple.y) {
                 score++;
+                increaseSpeed(score);
                 snake.maxCells++;
                 apple.x = getRandomInt(0, 25) * square;
                 apple.y = getRandomInt(0, 25) * square;
