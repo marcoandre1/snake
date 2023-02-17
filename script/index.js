@@ -30,34 +30,41 @@ let apple = {
     y: canvas.width === 300 ? 240 : 320
 };
 
+let score = 0;
+let highestScore = 0;
+
+let previousGameTimeStamp = performance.now();
+let previousTimeStamp = performance.now();
+let intendedFps = 15
+let fpsInterval = 1000 / intendedFps;
+
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-let score = 0;
-
-let previousGameTimeStamp = performance.now();
-let previousTimeStamp = performance.now();
-const intendedFps = 15
-const fpsInterval = 1000 / intendedFps;
+function increaseSpeed(score) {
+    if (score % 6 === 0) {
+        intendedFps += 5;
+        fpsInterval = 1000 / intendedFps;
+    }
+}
 
 // game loop
 function loop(timestamp) {
 
     const gameElapsed = timestamp - previousGameTimeStamp;
 
-    const elapsed = (timestamp - previousTimeStamp) / 1000;
-
     if (gameElapsed > fpsInterval) {
         // commonly required at the start of each frame in an animation
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
+        const elapsed = (timestamp - previousTimeStamp) / 1000;
         const fps = Math.round(1 / elapsed);
         ctx.font = 'caption';
         ctx.fillStyle = 'white';
         ctx.fillText("device FPS: " + fps, 20, 50);
 
-        const gameFps = Math.round(1000 / gameElapsed);
+        const gameFps = Math.round(1 / (gameElapsed / 1000));
         ctx.font = 'caption';
         ctx.fillStyle = 'white';
         ctx.fillText("game FPS: " + gameFps, 20, 70);
@@ -66,6 +73,11 @@ function loop(timestamp) {
         ctx.font = 'caption';
         ctx.fillStyle = 'white';
         ctx.fillText("Score: " + score, 20, 30);
+
+        //draw highest score
+        ctx.font = 'caption';
+        ctx.fillStyle = 'white';
+        ctx.fillText("Highest score: " + highestScore, 20, 90);
     
         // draw apple
         ctx.fillStyle = `rgb(
@@ -101,12 +113,17 @@ function loop(timestamp) {
         }
         
         // draw snake
-        ctx.fillStyle = 'green';
         snake.cells.forEach(function (cell, index) {
+            if (index === 0) {
+                ctx.fillStyle = 'purple'
+            } else {
+                ctx.fillStyle = 'green';
+            }
             ctx.fillRect(cell.x, cell.y, square - 1, square - 1);
             // snake ate apple
             if (cell.x === apple.x && cell.y === apple.y) {
                 score++;
+                increaseSpeed(score);
                 snake.maxCells++;
                 apple.x = getRandomInt(0, 25) * square;
                 apple.y = getRandomInt(0, 25) * square;
@@ -124,7 +141,10 @@ function loop(timestamp) {
                     snake.dy = 0;
                     apple.x = getRandomInt(0, 25) * square;
                     apple.y = getRandomInt(0, 25) * square;
+                    highestScore = score > highestScore ? score : highestScore;
                     score = 0;
+                    intendedFps = 15;
+                    fpsInterval = 1000 / intendedFps;
                 }
             }
         });
